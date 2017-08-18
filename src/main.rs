@@ -1,9 +1,12 @@
 extern crate android_glue;
 #[macro_use] extern crate conrod;
 extern crate glium;
+extern crate image;
+extern crate rand;
 extern crate rusttype;
 
 mod app;
+mod assets;
 use glium::Surface;
 
 pub fn main() {
@@ -14,39 +17,19 @@ pub fn main() {
     let display = glium::Display::new(builder, context, &events_loop).unwrap();
 
     let (w, h) = display.get_framebuffer_dimensions();
-    let mut ui = conrod::UiBuilder::new([w as f64, h as f64])
-        .theme(conrod::Theme {
-            name: "Theme".to_string(),
-            padding: conrod::position::Padding { x: conrod::position::range::Range { start: 10.0, end: 10.0 }, y: conrod::position::range::Range { start: 40.0, end: 80.0 } },
-            x_position: conrod::position::Position::Relative(conrod::position::Relative::Align(conrod::position::Align::Start), None),
-            y_position: conrod::position::Position::Relative(conrod::position::Relative::Direction(conrod::position::Direction::Backwards, 20.0), None),
-            background_color: conrod::color::WHITE,
-            shape_color: conrod::color::BLACK,
-            border_color: conrod::color::BLACK,
-            border_width: 0.0,
-            label_color: conrod::color::BLACK,
-            font_id: None,
-            font_size_large: 26,
-            font_size_medium: 18,
-            font_size_small: 12,
-            widget_styling: conrod::theme::StyleMap::default(),
-            mouse_drag_threshold: 0.0,
-            double_click_threshold: std::time::Duration::from_millis(500),
-        }).build();
+    let mut ui = conrod::UiBuilder::new([w as f64, h as f64]).theme(app::theme()).build();
+    ui.fonts.insert(assets::load_font("LiberationSans-Regular.ttf"));
 
-    match android_glue::load_asset("LiberationSans-Regular.ttf") {
-        Ok(data) => {
-            let font = rusttype::FontCollection::from_bytes(data).into_font();
-            ui.fonts.insert(font.unwrap());
-        },
-        Err(_) => panic!("Can't load font.")
-    }
+    let mut image_map: conrod::image::Map<glium::texture::Texture2d> = conrod::image::Map::new();
+    let image_rgba = assets::load_image("rust.png").to_rgba();
+    let dims = image_rgba.dimensions();
+    let raw_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image_rgba.into_raw(), dims);
+    let texture = glium::texture::Texture2d::new(&display, raw_image).unwrap();
+    let rust_logo = image_map.insert(texture);
 
+    let mut demo_app = app::DemoApp::new(rust_logo);
     let ids = app::Ids::new(ui.widget_id_generator());
 
-    let image_map: conrod::image::Map<glium::texture::Texture2d> = conrod::image::Map::new();
-    // if images will be used, make image_map mutable and add them here.
-    
     let (event_tx, event_rx) = std::sync::mpsc::channel();
     let (render_tx, render_rx) = std::sync::mpsc::channel();
     let events_loop_proxy = events_loop.create_proxy();
@@ -80,7 +63,7 @@ pub fn main() {
             }
 
             println!("Drawing the GUI.");
-            app::build_ui(ui.set_widgets(), &ids);
+            app::gui(&mut ui.set_widgets(), &ids, &mut demo_app);
 
             if let Some(primitives) = ui.draw_if_changed() {
                 if render_tx.send(primitives.owned()).is_err() || events_loop_proxy.wakeup().is_err() {
