@@ -69,7 +69,7 @@ widget_ids! {
 pub fn theme() -> conrod::Theme {
     conrod::Theme {
         name: "Theme".to_string(),
-        padding: conrod::position::Padding { x: conrod::position::range::Range { start: 10.0, end: 10.0 }, y: conrod::position::range::Range { start: 40.0, end: 80.0 } },
+        padding: conrod::position::Padding { x: conrod::position::range::Range { start: 10.0, end: 10.0 }, y: conrod::position::range::Range { start: 80.0, end: 80.0 } },
         x_position: conrod::position::Position::Relative(conrod::position::Relative::Align(conrod::position::Align::Start), None),
         y_position: conrod::position::Position::Relative(conrod::position::Relative::Direction(conrod::position::Direction::Backwards, 20.0), None),
         background_color: conrod::color::WHITE,

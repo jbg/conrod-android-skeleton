@@ -27,4 +27,10 @@ It displays all the Conrod UI widgets using OpenGL. This repository contains no 
 
 ## Project outline
 
-The Conrod & Glium setup code, event loop, etc are in `main.rs`. The code to draw the GUI is in `app.rs`.
+The Conrod & Glium setup code, event loop, render thread, etc are in `main.rs`. The code to lay out the GUI is in `app.rs`. Assets are loaded from the APK in `assets.rs`.
+
+## Issues
+
+This project currently depends on my own fork of Conrod (containing [just one patch](https://github.com/jbg/conrod/commit/cfab936b3b5b1bc6c419de5ae939f5a83b89baec)), due to [an issue](https://github.com/PistonDevelopers/conrod/issues/1045) with rendering on OpenGL ES.
+
+Everything is much smaller than it should be, possibly due to a DPI bug (see the end of the conversation in [this issue](https://github.com/PistonDevelopers/conrod/issues/884)).
