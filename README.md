@@ -1,6 +1,6 @@
 # Conrod Android skeleton
 
-This repository provides a simple example of using the Conrod Rust GUI library on Android.
+This repository provides a simple example of using the [Conrod Rust GUI library](https://github.com/PistonDevelopers/conrod) (part of the [Piston project](http://www.piston.rs/)) on Android.
 
 It displays all the Conrod UI widgets using OpenGL. This repository contains no Java!
 
